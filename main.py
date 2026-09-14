@@ -34,10 +34,11 @@ async def get_index():
 
 @app.post("/upload")
 async def upload_report(file: UploadFile = File(...), db: Session = Depends(get_db)):
-    if not os.path.exists("uploads"):
-        os.makedirs("uploads")
+    upload_dir = "/tmp/uploads" if os.environ.get("VERCEL") else "uploads"
+    if not os.path.exists(upload_dir):
+        os.makedirs(upload_dir)
         
-    file_path = f"uploads/{file.filename}"
+    file_path = f"{upload_dir}/{file.filename}"
     with open(file_path, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
         
