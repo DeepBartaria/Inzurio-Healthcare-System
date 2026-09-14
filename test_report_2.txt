@@ -1,0 +1,10 @@
+Lab Report
+Date: 2023-06-20
+Patient: John Doe
+
+Results:
+- HbA1c: 6.2 % (Range: 4.0 - 5.6 %) [HIGH]
+- Total Cholesterol: 210 mg/dL (Range: <200 mg/dL) [HIGH]
+- LDL: 130 mg/dL (Range: <100 mg/dL) [HIGH]
+- HDL: 45 mg/dL (Range: >40 mg/dL)
+- Fasting Glucose: 105 mg/dL (Range: 70 - 99 mg/dL) [HIGH]

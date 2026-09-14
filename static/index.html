@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inzurio</title>
+    <!-- Include marked.js for Markdown parsing -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&family=Syne:wght@700;800&display=swap');
+
+        * {
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-color: #f4f0ec;
+            --color-1: #FF3366; /* Hot pink */
+            --color-2: #00E5FF; /* Cyan */
+            --color-3: #FFEA00; /* Yellow */
+            --color-4: #4D00FF; /* Deep purple/blue */
+            --black: #111111;
+            --border-width: 4px;
+        }
+
+        body {
+            font-family: 'Space Mono', monospace;
+            background-color: var(--bg-color);
+            background-image: radial-gradient(var(--black) 1px, transparent 1px);
+            background-size: 20px 20px;
+            color: var(--black);
+            margin: 0;
+            padding: 1rem;
+            display: flex;
+            justify-content: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1400px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        header {
+            text-align: left;
+            background: var(--color-3);
+            border: var(--border-width) solid var(--black);
+            padding: 1rem 2rem;
+            box-shadow: 8px 8px 0 var(--black);
+            transform: rotate(-0.5deg);
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        h1 {
+            font-family: 'Syne', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: -2px;
+            margin: 0;
+            color: var(--black);
+            text-shadow: 3px 3px 0 var(--color-2), 6px 6px 0 var(--color-1);
+            line-height: 1;
+        }
+
+        p.subtitle {
+            margin: 0;
+            font-size: 1rem;
+            font-weight: 700;
+            background: var(--black);
+            color: var(--color-3);
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            transform: rotate(1deg);
+        }
+
+        .main-layout {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 1rem;
+            flex-grow: 1;
+            min-height: 0; /* Important for flex children to scroll */
+        }
+
+        @media (max-width: 900px) {
+            .main-layout {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto 1fr;
+            }
+        }
+
+        .card {
+            background: white;
+            border: var(--border-width) solid var(--black);
+            padding: 1.5rem;
+            box-shadow: 8px 8px 0 var(--black);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+        }
+        
+        .card::before {
+            content: "";
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            width: 20px;
+            height: 20px;
+            background: var(--color-1);
+            border: var(--border-width) solid var(--black);
+            border-radius: 50%;
+            z-index: 10;
+        }
+
+        /* Fun colors for cards */
+        .card:nth-child(1) { background-color: var(--color-2); }
+        .card:nth-child(2) { background-color: #fff; }
+
+        .card h2 {
+            font-family: 'Syne', sans-serif;
+            margin-top: 0;
+            font-size: 1.8rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            border-bottom: var(--border-width) solid var(--black);
+            padding-bottom: 0.5rem;
+            margin-bottom: 1rem;
+            flex-shrink: 0;
+        }
+
+        /* Upload Section */
+        #uploadForm {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .upload-area {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            border: var(--border-width) dashed var(--black);
+            padding: 0.75rem;
+            text-align: center;
+            background: white;
+            transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .upload-area:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 4px 4px 0 var(--black);
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .file-upload-btn {
+            background: var(--color-4);
+            color: white;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 0.9rem;
+            display: inline-block;
+            border: var(--border-width) solid var(--black);
+            text-transform: uppercase;
+            box-shadow: 4px 4px 0 var(--black);
+            transition: all 0.1s;
+            margin-bottom: 0.5rem;
+        }
+
+        .file-upload-btn:active {
+            transform: translate(2px, 2px);
+            box-shadow: 1px 1px 0 var(--black);
+        }
+
+        #fileName {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+            background: var(--color-3);
+            padding: 0.25rem;
+            border: 2px solid var(--black);
+            word-break: break-all;
+            font-size: 0.8rem;
+        }
+
+        button {
+            background: var(--color-1);
+            color: var(--black);
+            border: var(--border-width) solid var(--black);
+            padding: 0.5rem 1rem;
+            font-family: 'Space Mono', monospace;
+            font-weight: 700;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            cursor: pointer;
+            box-shadow: 4px 4px 0 var(--black);
+            transition: all 0.1s;
+            width: 100%;
+        }
+
+        button:active {
+            transform: translate(2px, 2px);
+            box-shadow: 1px 1px 0 var(--black);
+        }
+
+        #uploadStatus {
+            margin-top: 0.5rem;
+            font-size: 0.8rem;
+            font-weight: 700;
+            padding: 0.25rem;
+            border: var(--border-width) solid transparent;
+        }
+
+        .status-success { background: var(--color-3); border-color: var(--black) !important; box-shadow: 4px 4px 0 var(--black); }
+        .status-error { background: var(--color-1); color: white; border-color: var(--black) !important; box-shadow: 4px 4px 0 var(--black); }
+        .status-loading { background: var(--black); color: white; border-color: var(--black) !important; }
+
+        /* Chat Section */
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            min-height: 0;
+            gap: 1rem;
+        }
+
+        .chat-box {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 1rem;
+            background: var(--bg-color);
+            border: var(--border-width) solid var(--black);
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            box-shadow: inset 4px 4px 0 rgba(0,0,0,0.1);
+        }
+
+        /* Scrollbar styles */
+        .chat-box::-webkit-scrollbar { width: 10px; border-left: var(--border-width) solid var(--black); }
+        .chat-box::-webkit-scrollbar-track { background: var(--color-3); }
+        .chat-box::-webkit-scrollbar-thumb { background: var(--color-1); border: 2px solid var(--black); }
+
+        .message {
+            max-width: 90%;
+            padding: 1rem;
+            border: var(--border-width) solid var(--black);
+            line-height: 1.4;
+            font-size: 1rem;
+            font-weight: 700;
+            box-shadow: 4px 4px 0 var(--black);
+        }
+
+        .user-msg {
+            align-self: flex-end;
+            background: var(--color-3);
+            transform: rotate(1deg);
+        }
+
+        .agent-msg {
+            align-self: flex-start;
+            background: white;
+            transform: rotate(-0.5deg);
+        }
+
+        /* Markdown styling inside messages */
+        .agent-msg p { margin-top: 0; margin-bottom: 0.75rem; }
+        .agent-msg p:last-child { margin-bottom: 0; }
+        .agent-msg ul, .agent-msg ol { margin: 0.5rem 0; padding-left: 2rem; }
+        .agent-msg li { margin-bottom: 0.25rem; }
+        .agent-msg strong { background: var(--color-2); padding: 0 4px; border: 2px solid var(--black); }
+        
+        .warning {
+            display: block;
+            background: var(--color-1);
+            color: white;
+            padding: 0.75rem;
+            margin-top: 0.75rem;
+            border: var(--border-width) solid var(--black);
+            box-shadow: 4px 4px 0 var(--black);
+            text-transform: uppercase;
+            font-size: 1rem;
+            transform: rotate(2deg);
+        }
+
+        .input-area {
+            display: flex;
+            gap: 1rem;
+            background: var(--color-4);
+            padding: 1rem;
+            border: var(--border-width) solid var(--black);
+            box-shadow: 4px 4px 0 var(--black);
+            flex-shrink: 0;
+        }
+
+        .input-area input {
+            flex-grow: 1;
+            background: white;
+            border: var(--border-width) solid var(--black);
+            color: var(--black);
+            padding: 0.75rem;
+            font-family: 'Space Mono', monospace;
+            font-size: 1rem;
+            font-weight: 700;
+            outline: none;
+            box-shadow: inset 4px 4px 0 rgba(0,0,0,0.1);
+            min-width: 0;
+        }
+
+        .input-area input:focus {
+            background: var(--color-3);
+        }
+        
+        .input-area button {
+            width: auto;
+            background: var(--color-3);
+            border: var(--border-width) solid var(--black);
+            box-shadow: 4px 4px 0 var(--black);
+            padding: 0.75rem 1.5rem;
+        }
+
+        .input-area button:active {
+            transform: translate(2px, 2px);
+            box-shadow: 2px 2px 0 var(--black);
+        }
+
+        /* Loading indicator */
+        .typing-indicator {
+            display: flex;
+            gap: 8px;
+            padding: 0.75rem 1rem;
+            background: var(--black);
+            border: var(--border-width) solid var(--black);
+            align-self: flex-start;
+            box-shadow: 4px 4px 0 var(--color-2);
+        }
+        
+        .typing-dot {
+            width: 10px;
+            height: 10px;
+            background: var(--color-3);
+            border-radius: 0;
+            border: 2px solid white;
+            animation: bounce 0.6s infinite alternate;
+        }
+        
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; background: var(--color-1); }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; background: var(--color-2); }
+        
+        @keyframes bounce {
+            to { transform: translateY(-8px); }
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Inzurio</h1>
+            <p class="subtitle">MAXIMALIST HEALTH TRACKER.</p>
+        </header>
+
+        <div class="main-layout">
+            <!-- Left Sidebar for Upload and Correction -->
+            <div style="display: flex; flex-direction: column; gap: 1rem; flex-grow: 1; min-height: 0;">
+                <div class="card" style="flex-grow: 1;">
+                    <h2>1. UPLOAD</h2>
+                    <form id="uploadForm">
+                        <div class="upload-area">
+                            <label for="reportFile" class="file-upload-btn">SELECT FILE</label>
+                            <input type="file" id="reportFile" required onchange="document.getElementById('fileName').textContent = this.files[0] ? this.files[0].name : 'NONE SELECTED!'" />
+                            <span id="fileName">WAITING FOR FILE...</span>
+                            <div>
+                                <button type="submit" id="uploadBtn">EXTRACT DATA</button>
+                            </div>
+                            <div id="uploadStatus"></div>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="card" style="min-height: auto; flex-shrink: 0;">
+                    <h2 style="font-size: 1.2rem; margin-bottom: 0.5rem;">2. CORRECTION PROTOCOL</h2>
+                    <form id="correctionForm" style="display: flex; flex-direction: column; gap: 0.5rem;">
+                        <div style="display: flex; gap: 0.5rem;">
+                            <input type="number" id="resultId" placeholder="ID" required style="width: 80px; padding: 0.5rem; font-family: 'Space Mono'; font-weight: bold; border: 4px solid var(--black);" />
+                            <input type="text" id="newValue" placeholder="NEW VALUE" required style="flex-grow: 1; min-width: 0; padding: 0.5rem; font-family: 'Space Mono'; font-weight: bold; border: 4px solid var(--black);" />
+                        </div>
+                        <button type="submit" style="width: 100%; padding: 0.75rem 1rem;">FIX IT</button>
+                    </form>
+                    <div id="correctionStatus" style="font-size: 0.8rem; margin-top: 0.5rem; font-weight: bold;"></div>
+                </div>
+            </div>
+
+            <!-- Right Content for Chat -->
+            <div class="card" style="display: flex; flex-direction: column;">
+                <h2>3. INTERROGATE</h2>
+                <div class="chat-container">
+                    <div class="chat-box" id="chatBox">
+                        <div class="message agent-msg">
+                            <p><strong>SYSTEM READY.</strong> I am the Maximalist Agent.</p>
+                            <p>Upload a report and demand answers:</p>
+                            <ul>
+                                <li>"WHAT IS MY HBA1C?!"</li>
+                                <li>"GIVE ME THE OUT OF RANGE RESULTS!"</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <form id="chatForm" class="input-area">
+                        <input type="text" id="query" placeholder="TYPE YOUR DEMAND HERE..." autocomplete="off" required />
+                        <button type="submit" id="sendBtn">SEND IT</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configure marked to be safe and use github flavor
+        marked.setOptions({
+            gfm: true,
+            breaks: true,
+        });
+
+        document.getElementById('correctionForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const resultId = document.getElementById('resultId').value;
+            const newValue = document.getElementById('newValue').value;
+            const statusDiv = document.getElementById('correctionStatus');
+            
+            statusDiv.innerText = "UPDATING...";
+            try {
+                const res = await fetch('/update_result', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ result_id: parseInt(resultId), new_value: newValue })
+                });
+                if (res.ok) {
+                    statusDiv.innerText = "DONE. VALUE OVERWRITTEN.";
+                    document.getElementById('resultId').value = '';
+                    document.getElementById('newValue').value = '';
+                } else {
+                    statusDiv.innerText = "FAILED. ID NOT FOUND.";
+                }
+            } catch (err) {
+                statusDiv.innerText = "NETWORK ERROR.";
+            }
+        };
+
+        document.getElementById('uploadForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const formData = new FormData();
+            const fileInput = document.getElementById('reportFile');
+            const statusDiv = document.getElementById('uploadStatus');
+            const btn = document.getElementById('uploadBtn');
+            
+            if(!fileInput.files[0]) return;
+            
+            formData.append('file', fileInput.files[0]);
+            
+            statusDiv.className = 'status-loading';
+            statusDiv.innerText = "PROCESSING WITH EXTREME PREJUDICE...";
+            btn.disabled = true;
+            btn.style.opacity = 0.7;
+            
+            try {
+                const res = await fetch('/upload', { method: 'POST', body: formData });
+                const data = await res.json();
+                
+                if (res.ok) {
+                    statusDiv.className = 'status-success';
+                    statusDiv.innerText = `BOOM! REPORT #${data.report_id} INGESTED.`;
+                    fileInput.value = '';
+                    document.getElementById('fileName').textContent = 'WAITING FOR NEXT FILE...';
+                } else {
+                    statusDiv.className = 'status-error';
+                    statusDiv.innerText = "ERROR! " + (data.detail || JSON.stringify(data));
+                }
+            } catch(err) {
+                statusDiv.className = 'status-error';
+                statusDiv.innerText = "NETWORK DESTROYED (Error).";
+            } finally {
+                btn.disabled = false;
+                btn.style.opacity = 1;
+            }
+        };
+
+        document.getElementById('chatForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const queryInput = document.getElementById('query');
+            const query = queryInput.value;
+            const chatBox = document.getElementById('chatBox');
+            const sendBtn = document.getElementById('sendBtn');
+            
+            // Add user message
+            chatBox.insertAdjacentHTML('beforeend', `<div class="message user-msg">${query}</div>`);
+            queryInput.value = '';
+            chatBox.scrollTop = chatBox.scrollHeight;
+            
+            // Add loading indicator
+            const typingId = 'typing-' + Date.now();
+            chatBox.insertAdjacentHTML('beforeend', `
+                <div id="${typingId}" class="typing-indicator">
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                </div>
+            `);
+            chatBox.scrollTop = chatBox.scrollHeight;
+            
+            queryInput.disabled = true;
+            sendBtn.disabled = true;
+            
+            try {
+                const res = await fetch('/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ query })
+                });
+                const data = await res.json();
+                
+                // Remove loading indicator
+                document.getElementById(typingId).remove();
+                
+                if (res.ok) {
+                    let responseText = data.response;
+                    
+                    // First parse markdown
+                    let htmlResponse = marked.parse(responseText);
+                    
+                    // Then highlight critical warnings
+                    htmlResponse = htmlResponse.replace(/(WARNING: A critical value was detected.*)/gi, '<span class="warning">$1</span>');
+                    
+                    chatBox.insertAdjacentHTML('beforeend', `<div class="message agent-msg">${htmlResponse}</div>`);
+                } else {
+                    chatBox.insertAdjacentHTML('beforeend', `<div class="message agent-msg status-error"><span>ERROR: ${data.detail}</span></div>`);
+                }
+            } catch(err) {
+                document.getElementById(typingId).remove();
+                chatBox.insertAdjacentHTML('beforeend', `<div class="message agent-msg status-error"><span>NETWORK FAILURE</span></div>`);
+            } finally {
+                queryInput.disabled = false;
+                sendBtn.disabled = false;
+                queryInput.focus();
+                chatBox.scrollTop = chatBox.scrollHeight;
+            }
+        };
+    </script>
+</body>
+</html>

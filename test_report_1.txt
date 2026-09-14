@@ -1,0 +1,10 @@
+Lab Report
+Date: 2023-01-15
+Patient: John Doe
+
+Results:
+- A1C: 5.8 % (Range: 4.0 - 5.6 %)
+- Total Cholesterol: 190 mg/dL (Range: <200 mg/dL)
+- LDL: 110 mg/dL (Range: <100 mg/dL) [HIGH]
+- HDL: 50 mg/dL (Range: >40 mg/dL)
+- Glucose: 95 mg/dL (Range: 70 - 99 mg/dL)
